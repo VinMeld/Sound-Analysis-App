@@ -98,15 +98,6 @@ function ConnectionLine({ start, end } : ConnectionLineProps) {
   );
 }
 
-  return (
-    <Line
-    points={[new THREE.Vector3(start[0], start[1], start[2]), end]}
-    color="black"
-  />
-      
-  );
-}
-
 export default function Scene() {
   const [squarePos, setSquarePos] = useState<THREE.Vector3>(new THREE.Vector3(0, 0, 0));
 
