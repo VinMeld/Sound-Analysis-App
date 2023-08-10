@@ -4,7 +4,7 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { useDrag } from 'react-use-gesture';
 import { useThree, ThreeEvent } from "@react-three/fiber";
 import * as THREE from 'three';
-import { Line } from "@react-three/drei";
+import { Line, OrbitControls } from "@react-three/drei";
 
 type Vector3 = {
   x: number;
@@ -117,6 +117,7 @@ export default function Scene() {
       <ConnectionLine start={[-2, 2, 0]} end={squarePos} />
       <ConnectionLine start={[2, 2, 0]} end={squarePos} />
       <ConnectionLine start={[-2, -2, 0]} end={squarePos} />
+      <OrbitControls />
     </Canvas>
   );
 }
