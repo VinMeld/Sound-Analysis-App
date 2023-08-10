@@ -16,13 +16,16 @@ type SquareProps = {
   onMove: (position: Vector3) => void;
   position: THREE.Vector3;
 };
+
 type SphereProps = {
   position: [number, number, number];
 };
+
 type ConnectionLineProps = {
   start: [number, number, number];
   end: THREE.Vector3;
 };
+
 const Square = ({ onMove, position } : SquareProps) => {
   const ref = useRef<THREE.Mesh | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -61,10 +64,6 @@ const Square = ({ onMove, position } : SquareProps) => {
     setIsDragging(false);
     window.removeEventListener('pointermove', handlePointerMove);
     window.removeEventListener('pointerup', stopDragging);
-  };
-
-  const handlePointerUp = (event: PointerEvent) => {
-    setIsDragging(false);
   };
 
   return (
