@@ -2,11 +2,29 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { useDrag } from 'react-use-gesture';
-import { useThree } from "@react-three/fiber";
+import { useThree, ThreeEvent } from "@react-three/fiber";
 import * as THREE from 'three';
+import { Line } from "@react-three/drei";
 
-function Square({ onMove, position }) {
-  const ref = useRef();
+type Vector3 = {
+  x: number;
+  y: number;
+  z: number;
+};
+
+type SquareProps = {
+  onMove: (position: Vector3) => void;
+  position: THREE.Vector3;
+};
+type SphereProps = {
+  position: [number, number, number];
+};
+type ConnectionLineProps = {
+  start: [number, number, number];
+  end: THREE.Vector3;
+};
+const Square = ({ onMove, position } : SquareProps) => {
+  const ref = useRef<THREE.Mesh | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const { gl, camera } = useThree();
 
@@ -17,13 +35,13 @@ function Square({ onMove, position }) {
   });
 
 
-  const handlePointerDown = (event) => {
+  const handlePointerDown  = (event: ThreeEvent<PointerEvent>) => {
     setIsDragging(true);
     window.addEventListener('pointermove', handlePointerMove);
     window.addEventListener('pointerup', stopDragging);
   };
 
-  const handlePointerMove = (event) => {
+  const handlePointerMove = (event: PointerEvent) => {
     if (!isDragging) return;
 
     event.stopPropagation();
@@ -34,19 +52,18 @@ function Square({ onMove, position }) {
 
     // Convert the normalized device coordinates into a 3D position
     const vector = new THREE.Vector3(x, y, 0).unproject(camera);
-
-    ref.current.position.set(vector.x, vector.y, 0);
+    ref.current?.position.set(vector.x, vector.y, 0);
     onMove({ x: vector.x, y: vector.y, z: 0 });
 
   };
   
-  const stopDragging = (event) => {
+  const stopDragging = (event: PointerEvent) => {
     setIsDragging(false);
     window.removeEventListener('pointermove', handlePointerMove);
     window.removeEventListener('pointerup', stopDragging);
   };
 
-  const handlePointerUp = (event) => {
+  const handlePointerUp = (event: PointerEvent) => {
     setIsDragging(false);
   };
 
@@ -63,7 +80,7 @@ function Square({ onMove, position }) {
 
 }
 
-function Sphere({ position }) {
+function Sphere({ position }: SphereProps) {
   return (
     <mesh position={position}>
       <sphereGeometry args={[0.5, 16, 16]} />
@@ -72,30 +89,28 @@ function Sphere({ position }) {
   );
 }
 
-function ConnectionLine({ start, end }) {
-  const lineRef = useRef();
-
-  useEffect(() => {
-    if (lineRef.current) {
-      const startVec = new THREE.Vector3(...start);
-      const endVec = new THREE.Vector3(...end);
-      lineRef.current.geometry.setFromPoints([startVec, endVec]);
-      lineRef.current.geometry.verticesNeedUpdate = true;
-    }
-  }, [start, end]);
+function ConnectionLine({ start, end } : ConnectionLineProps) {
+  return (
+    <Line
+      points={[new THREE.Vector3(start[0], start[1], start[2]), end]}
+      color="black"
+    />
+  );
+}
 
   return (
-    <line ref={lineRef}>
-      <bufferGeometry attach="geometry" />
-      <lineBasicMaterial attach="material" color="black" />
-    </line>
+    <Line
+    points={[new THREE.Vector3(start[0], start[1], start[2]), end]}
+    color="black"
+  />
+      
   );
 }
 
 export default function Scene() {
-  const [squarePos, setSquarePos] = useState(new THREE.Vector3(0, 0, 0)); // Use state
+  const [squarePos, setSquarePos] = useState<THREE.Vector3>(new THREE.Vector3(0, 0, 0));
 
-  const handleSquareMove = (position) => {
+  const handleSquareMove = (position: Vector3) => {
     setSquarePos(new THREE.Vector3(position.x, position.y, position.z));
   };
 
