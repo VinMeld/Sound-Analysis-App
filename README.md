@@ -1,34 +1,39 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Sound Detection and Visualization System with ESP32 and AWS
 
-## Getting Started
+## Overview
+This project uses the ESP32 microcontroller paired with the MAX9814 microphone to detect and monitor sound levels. Detected sound data is sent via MQTT to the AWS IoT broker and stored in DynamoDB. A Next.js frontend application visualizes this data in real-time.
 
-First, run the development server:
+[Check out the live website here!](https://sound.vinaycloud.ca)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Components
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Hardware:
+1. **ESP32 Microcontroller**:
+   - Responsible for sensing data from the microphone and communicating with the AWS IoT broker.
+2. **MAX9814 Microphone**:
+   - A high-quality microphone with auto-gain control, allowing for consistent sound level detection.
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+### Software:
+1. **AWS IoT Broker** ![AWS icon](http://cdn.jsdelivr.net/gh/devicons/devicon/icons/amazonwebservices/amazonwebservices-original.svg):
+   - Middleware that receives data from the ESP32 and interfaces with DynamoDB.
+2. **DynamoDB** ![DynamoDB icon](http://cdn.jsdelivr.net/gh/devicons/devicon/icons/amazonwebservices/amazonwebservices-original-wordmark.svg):
+   - A NoSQL database provided by AWS to persistently store sound data.
+3. **Next.js Application** ![Next.js icon](http://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original-wordmark.svg):
+   - A real-time frontend application that fetches and visualizes data from DynamoDB.
 
-## Learn More
+## How It Works:
+1. The MAX9814 microphone listens for sound.
+2. Once sound is detected, the ESP32 reads the decibel level and packages this data.
+3. The ESP32 initiates an MQTT publishing request to the AWS IoT broker with the sound data.
+4. The AWS IoT broker, upon receiving the data, stores it in a DynamoDB table.
+5. The Next.js frontend application periodically dispatches GET requests to fetch the latest sound data entries from DynamoDB.
+6. The frontend visualizes this data using the `recharts` library, updating in real-time.
 
-To learn more about Next.js, take a look at the following resources:
+## Setting Up:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Prerequisites:
+- Node.js and npm installed.
+- An AWS account with appropriate permissions for DynamoDB and IoT.
+- ESP32 with the Arduino IDE set up.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
