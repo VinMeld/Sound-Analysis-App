@@ -95,8 +95,12 @@ function DataVisualizationComponent() {
     </div>
   );
 }
-
-function CustomTooltip({ payload, label, active }) {
+type CustomTooltipProps = {
+  payload?: any;
+  label?: any;
+  active?: any;
+};
+function CustomTooltip({ payload, label, active }: CustomTooltipProps) {
   if (active && payload && payload.length) {
     const date = new Date(label * 1000);
     return (

@@ -3,23 +3,18 @@ import { NextApiResponse } from "next";
 import { NextResponse } from "next/server";
 import {
   DynamoDBClient,
-  QueryCommand,
   AttributeValue,
   ScanCommand,
 } from "@aws-sdk/client-dynamodb";
 import { URL } from "url";
-
-type QueryParams = {
+type ParamsType = {
   TableName: string;
-  KeyConditionExpression?: string;
-  ScanIndexForward?: boolean;
   Limit: number;
   ExclusiveStartKey?: {
-    partition: AttributeValue;
-    timestamp: AttributeValue;
+    partition: { S: string };
+    timestamp: { N: string };
   };
 };
-
 // Initialize DynamoDB client
 const client = new DynamoDBClient({
   region: process.env.AWS_REGION || "us-east-2",
@@ -36,7 +31,7 @@ export async function GET(request: Request, response: NextApiResponse) {
   const startKeyTimestamp = url.searchParams.get("startKeyTimestamp");
   const startKeyPartition = url.searchParams.get("startKeyPartition");
 
-  let params = {
+  let params : ParamsType = {
     TableName: "DeviceData",
     Limit: 50,
   };
