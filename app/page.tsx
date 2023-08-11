@@ -1,122 +1,113 @@
-"use client"
-import React, { useRef, useState, useEffect } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { useDrag } from 'react-use-gesture';
-import { useThree, ThreeEvent } from "@react-three/fiber";
-import * as THREE from 'three';
-import { Line, OrbitControls } from "@react-three/drei";
+"use client";
+import { useState, useEffect } from "react";
+import {
+  LineChart,
+  Line,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Label,
+  ResponsiveContainer,
+} from "recharts";
 
-type Vector3 = {
-  x: number;
-  y: number;
-  z: number;
-};
-
-type SquareProps = {
-  onMove: (position: Vector3) => void;
-  position: THREE.Vector3;
-};
-
-type SphereProps = {
-  position: [number, number, number];
-};
-
-type ConnectionLineProps = {
-  start: [number, number, number];
-  end: THREE.Vector3;
-};
-
-const Square = ({ onMove, position } : SquareProps) => {
-  const ref = useRef<THREE.Mesh | null>(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const { gl, camera } = useThree();
-
-  useFrame(() => {
-    if (ref.current) {
-      ref.current.rotation.z += 0.01; // Rotate square around the z-axis
-    }
-  });
-
-
-  const handlePointerDown  = (event: ThreeEvent<PointerEvent>) => {
-    setIsDragging(true);
-    window.addEventListener('pointermove', handlePointerMove);
-    window.addEventListener('pointerup', stopDragging);
+function DataVisualizationComponent() {
+  type DataItem = {
+    timestamp: number;
+    decibel: number;
   };
 
-  const handlePointerMove = (event: PointerEvent) => {
-    if (!isDragging) return;
+  const [data, setData] = useState<DataItem[]>([]);
+  const [lastKey, setLastKey] = useState(null);
+  useEffect(() => {
+    const fetchData = async () => {
+      let endpoint = "/api/data";
+      if (lastKey) {
+        endpoint += `?startKey=${lastKey}`;
+      }
+      try {
+        const response = await fetch(endpoint);
+        console.log(response)
+        if (response.status != 200) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        console.log("not error")
+        const result = await response.json();
+        console.log(result, "result");
+        setData(result);
+        setLastKey(result.lastKey);
+        console.log(data)
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
 
-    event.stopPropagation();
+    fetchData(); // Call immediately when the component mounts
 
-    // Translate the event clientX and clientY into normalized device coordinates
-    const x = (event.clientX / gl.domElement.clientWidth) * 2 - 1;
-    const y = -(event.clientY / gl.domElement.clientHeight) * 2 + 1;
+    //const intervalId = setInterval(fetchData, 5000); // Then every 5 seconds
 
-    // Convert the normalized device coordinates into a 3D position
-    const vector = new THREE.Vector3(x, y, 0).unproject(camera);
-    ref.current?.position.set(vector.x, vector.y, 0);
-    onMove({ x: vector.x, y: vector.y, z: 0 });
+    // // Cleanup the interval when the component unmounts
+    //return () => clearInterval(intervalId);
+  }, [lastKey]); // This effect will run every time lastKey changes
 
-  };
-  
-  const stopDragging = (event: PointerEvent) => {
-    setIsDragging(false);
-    window.removeEventListener('pointermove', handlePointerMove);
-    window.removeEventListener('pointerup', stopDragging);
-  };
-
-  return (
-    <mesh
-    ref={ref}
-    onPointerDown={handlePointerDown}
-    position={position}
-  >
-    <planeGeometry args={[1, 1]} />
-    <meshStandardMaterial color="blue" />
-  </mesh>
-  );
-
-}
-
-function Sphere({ position }: SphereProps) {
-  return (
-    <mesh position={position}>
-      <sphereGeometry args={[0.5, 16, 16]} />
-      <meshStandardMaterial color="green" />
-    </mesh>
-  );
-}
-
-function ConnectionLine({ start, end } : ConnectionLineProps) {
-  return (
-    <Line
-      points={[new THREE.Vector3(start[0], start[1], start[2]), end]}
-      color="black"
-    />
-  );
-}
-
-export default function Scene() {
-  const [squarePos, setSquarePos] = useState<THREE.Vector3>(new THREE.Vector3(0, 0, 0));
-
-  const handleSquareMove = (position: Vector3) => {
-    setSquarePos(new THREE.Vector3(position.x, position.y, position.z));
-  };
+  // ...
 
   return (
-    <Canvas camera={{ position: [0, 0, 5] }} className="bg-white w-screen h-screen">
-      <ambientLight intensity={0.5} />
-      <pointLight position={[10, 10, 10]} />
-
-      <Square position={squarePos} onMove={handleSquareMove} />
-      <Sphere position={[-2, 2, 0]} />
-      <Sphere position={[2, 2, 0]} />
-      <Sphere position={[-2, -2, 0]} />
-      <ConnectionLine start={[-2, 2, 0]} end={squarePos} />
-      <ConnectionLine start={[2, 2, 0]} end={squarePos} />
-      <ConnectionLine start={[-2, -2, 0]} end={squarePos} />
-      <OrbitControls />
-    </Canvas>
+  <div className="h-screen w-screen bg-[#272822] flex flex-col items-center justify-center">
+  <h1 className="text-center text-[#f92672] font-bold text-2xl mb-4 mt-4">Sound Intensity Analysis</h1>
+      <ResponsiveContainer width="90%" height="90%" className="mt-8">
+      <LineChart
+          data={data.sort((a, b) => a.timestamp - b.timestamp)}
+          margin={{ top: 20, right: 20, bottom: 50, left: 50 }}
+      >
+          <Line type="monotone" dataKey="decibel" stroke="#f92672" strokeWidth={3}  />
+          <CartesianGrid stroke="#75715E" />
+          <XAxis
+            dataKey="timestamp"
+            tickFormatter={(unixTime) =>
+              new Date(unixTime * 1000).toLocaleTimeString()
+            }
+            stroke="#f8f8f2"
+          >
+            <Label
+              value="Time"
+              offset={-10}
+              position="insideBottom"
+              style={{ fill: "#f8f8f2" }}
+            />
+          </XAxis>
+          <YAxis width={80} stroke="#f8f8f2">
+            <Label
+              value="Decibel"
+              angle={-90}
+              position="insideLeft"
+              style={{ textAnchor: "middle", fill: "#f8f8f2" }}
+            />
+          </YAxis>
+          <Tooltip content={<CustomTooltip />} />
+          <Label
+            value="Decibel Levels Over Time"
+            position="top"
+            style={{ fontSize: "20px", textAnchor: "middle", fill: "#f8f8f2" }}
+          />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
   );
 }
+
+function CustomTooltip({ payload, label, active }) {
+  if (active && payload && payload.length) {
+    const date = new Date(label * 1000);
+    return (
+      <div className="bg-[#3E3D32] p-3 border border-[#75715E] text-[#f8f8f2]">
+        <p className="label">{`Time: ${date.toLocaleString()}`}</p>
+        <p className="desc">{`Decibel: ${payload[0].value}`}</p>
+      </div>
+    );
+  }
+
+  return null;
+}
+
+export default DataVisualizationComponent;
