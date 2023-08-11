@@ -3,6 +3,7 @@
 ## Overview
 This project uses the ESP32 microcontroller paired with the MAX9814 microphone to detect and monitor sound levels. Detected sound data is sent via MQTT to the AWS IoT broker and stored in DynamoDB. A Next.js frontend application visualizes this data in real-time.
 
+![Image of website](./public/sound.png)
 [Check out the live website here!](https://sound.vinaycloud.ca)
 
 `ESP32` `MAX9814` `MQTT` `AWS IoT` `DynamoDB` `Next.js` `recharts`

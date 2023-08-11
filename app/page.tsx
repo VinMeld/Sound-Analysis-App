@@ -19,6 +19,23 @@ function DataVisualizationComponent() {
 
   const [data, setData] = useState<DataItem[]>([]);
   const [lastKey, setLastKey] = useState(null);
+  const [theme, setTheme] = useState<string>("dark");
+  const toggleTheme = () => {
+    setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
+  };
+  useEffect(() => {
+    // Fetch user's preferred theme from local storage on component mount
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme) {
+      setTheme(savedTheme);
+    }
+  }, []);
+
+  useEffect(() => {
+    // Save theme changes to local storage
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
   useEffect(() => {
     const fetchData = async () => {
       let endpoint = "/api/data";
@@ -50,15 +67,41 @@ function DataVisualizationComponent() {
     //return () => clearInterval(intervalId);
   }, [lastKey]); // This effect will run every time lastKey changes
 
-  // ...
+  const bgColor = theme === "light" ? "bg-white" : "bg-[#272822]";
+  const textColor = theme === "light" ? "text-black" : "text-[#f8f8f2]";
+  const secondaryColor = theme === "light" ? "text-gray-700" : "text-[#f92672]";
+  const borderColor =
+    theme === "light" ? "border-gray-300" : "border-[#75715E]";
+  const chartStroke = theme === "light" ? "#333" : "#f92672";
+  const gridColor = theme === "light" ? "#ddd" : "#75715E";
+  const axisColor = theme === "light" ? "#555" : "#f8f8f2";
 
   return (
-    <div className="h-screen w-screen bg-[#272822] flex flex-col items-center justify-center px-4">
-      <h1 className="text-center text-[#f92672] font-bold text-xl sm:text-2xl mb-4 mt-4">
-        Sound Intensity Analysis
-      </h1>
+    <div
+      className={`${bgColor} ${textColor} h-screen w-screen flex flex-col items-center justify-center px-4`}
+    >
+      <div className="flex items-center justify-center mb-4 mt-4">
+        <h1 className="text-center text-[#f92672] font-bold text-xl sm:text-2xl mr-4">
+          Sound Intensity Analysis
+        </h1>
+        <button
+          type="button"
+          onClick={toggleTheme}
+          className="p-2 text-lg p-1 rounded-sm bg-transparent"
+          color="primary"
+        >
+          <img
+            width={25}
+            alt="Sun or Moon"
+            src={theme === "light" ? `./sun.svg` : `./moon.svg`}
+          />
+        </button>
+      </div>
+
       <div className="max-w-9/10 w-full">
-        <p className="text-[#f8f8f2] text-center mb-6 mx-2 sm:mx-6 text-sm sm:text-base">
+        <p
+          className={`${textColor} text-center mb-6 mx-2 sm:mx-6 text-sm sm:text-base`}
+        >
           This system employs a MAX9814 microphone attached to an ESP32
           microcontroller. When a sound is detected, the ESP32 initiates an MQTT
           publishing request to the AWS IoT broker. This data is then stored
@@ -66,7 +109,11 @@ function DataVisualizationComponent() {
           is dispatched every few seconds to fetch the latest entries, updating
           the graph below in real-time.
         </p>
-        <ResponsiveContainer width="100%" height={300} className="chart-container mt-8">
+        <ResponsiveContainer
+          width="100%"
+          height={300}
+          className="chart-container mt-8"
+        >
           <LineChart
             data={data.sort((a, b) => a.timestamp - b.timestamp)}
             margin={{ top: 20, right: 20, bottom: 50, left: 50 }}
@@ -74,30 +121,30 @@ function DataVisualizationComponent() {
             <Line
               type="monotone"
               dataKey="decibel"
-              stroke="#f92672"
+              stroke={chartStroke}
               strokeWidth={3}
             />
-            <CartesianGrid stroke="#75715E" />
+            <CartesianGrid stroke={gridColor} />
             <XAxis
               dataKey="timestamp"
               tickFormatter={(unixTime) =>
                 new Date(unixTime * 1000).toLocaleTimeString()
               }
-              stroke="#f8f8f2"
+              stroke={axisColor}
             >
               <Label
                 value="Time"
                 offset={-10}
                 position="insideBottom"
-                style={{ fill: "#f8f8f2" }}
+                style={{ fill: axisColor }}
               />
             </XAxis>
-            <YAxis width={80} stroke="#f8f8f2">
+            <YAxis width={80} stroke={axisColor}>
               <Label
                 value="Decibel"
                 angle={-90}
                 position="insideLeft"
-                style={{ textAnchor: "middle", fill: "#f8f8f2" }}
+                style={{ textAnchor: "middle", fill: axisColor }}
               />
             </YAxis>
             <Tooltip content={<CustomTooltip />} />
@@ -107,7 +154,7 @@ function DataVisualizationComponent() {
               style={{
                 fontSize: "20px",
                 textAnchor: "middle",
-                fill: "#f8f8f2",
+                fill: axisColor,
               }}
             />
           </LineChart>
