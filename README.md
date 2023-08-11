@@ -5,6 +5,7 @@ This project uses the ESP32 microcontroller paired with the MAX9814 microphone t
 
 [Check out the live website here!](https://sound.vinaycloud.ca)
 
+`ESP32` `MAX9814` `MQTT` `AWS IoT` `DynamoDB` `Next.js` `recharts`
 
 ## Components
 
@@ -15,11 +16,11 @@ This project uses the ESP32 microcontroller paired with the MAX9814 microphone t
    - A high-quality microphone with auto-gain control, allowing for consistent sound level detection.
 
 ### Software:
-1. **AWS IoT Broker** ![AWS icon](http://cdn.jsdelivr.net/gh/devicons/devicon/icons/amazonwebservices/amazonwebservices-original.svg):
+1. **AWS IoT Broker**:
    - Middleware that receives data from the ESP32 and interfaces with DynamoDB.
-2. **DynamoDB** ![DynamoDB icon](http://cdn.jsdelivr.net/gh/devicons/devicon/icons/amazonwebservices/amazonwebservices-original-wordmark.svg):
+2. **DynamoDB**:
    - A NoSQL database provided by AWS to persistently store sound data.
-3. **Next.js Application** ![Next.js icon](http://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original-wordmark.svg):
+3. **Next.js Application**:
    - A real-time frontend application that fetches and visualizes data from DynamoDB.
 
 ## How It Works:
