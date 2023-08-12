@@ -61,10 +61,10 @@ function DataVisualizationComponent() {
 
     fetchData(); // Call immediately when the component mounts
 
-    //const intervalId = setInterval(fetchData, 5000); // Then every 5 seconds
+    const intervalId = setInterval(fetchData, 1000); // Then every 5 seconds
 
     // // Cleanup the interval when the component unmounts
-    //return () => clearInterval(intervalId);
+    return () => clearInterval(intervalId);
   }, [lastKey]); // This effect will run every time lastKey changes
 
   const bgColor = theme === "light" ? "bg-white" : "bg-[#272822]";

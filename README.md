@@ -8,6 +8,16 @@ This project uses the ESP32 microcontroller paired with the MAX9814 microphone t
 
 `ESP32` `MAX9814` `MQTT` `AWS IoT` `DynamoDB` `Next.js` `recharts`
 
+## Live Demo:
+<video width="320" height="240" controls>
+  <source src="./public/sound.webm" type="video/webm">
+  Your browser does not support the video tag.
+</video>
+
+## Setup
+
+<img src="./public/setup_esp32.jpg" alt="Setup of ESP32 on Breadboard" width="300"/>
+
 ## Components
 
 ### Hardware:
