@@ -10,7 +10,7 @@ This project uses the ESP32 microcontroller paired with the MAX9814 microphone t
 
 ## Live Demo:
 <video width="320" height="240" controls>
-  <source src="./public/sound.webm" type="video/webm">
+  <source src="https://github.com/VinMeld/Sound-Analysis-App/blob/main/public/sound.webm" type="video/webm">
   Your browser does not support the video tag.
 </video>
 
